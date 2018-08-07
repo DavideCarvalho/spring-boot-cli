@@ -9,7 +9,8 @@ getJsonFile = (jsonFileName) => {
 
 program
   .command('crud <objectName>')
-  .option('-f, --file <stringPropertyName>', 'receive a property that will be a string', getJsonFile)
+  .option('-f, --file <fileName>', 'receive json file with property and its types', getJsonFile)
+  .option('-p, --package <packageName>', 'receive package name to be inserted into the generated files')
   .description('Generate a crud based on given name and object type')
   .action(generateSpringBootCrud);
 

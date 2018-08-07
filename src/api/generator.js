@@ -6,12 +6,26 @@ const CURR_DIR = process.cwd();
 const springBootComponentFileName = 'springBootComponentTemplate.txt';
 const springBootRepositoryFileName = 'springBootRepositoryTemplate.txt';
 const objectNameCapitalizedPlaceholder = '<%objectNameCapitalized%>';
+const objectNamePlaceholder = '<%objectName%>';
+const packageNamePlaceholder = '<%packageName%>';
 const utf8Encoding = 'utf8';
 const springBootSaveDirectories = {
   controllers: `${CURR_DIR}/controllers`,
   services: `${CURR_DIR}/services`,
   models: `${CURR_DIR}/models`,
   repositories: `${CURR_DIR}/repositories`
+};
+
+String.prototype.changeCapitalizedObjectName = function(capitalizedObjectName) {
+  return this.split(objectNameCapitalizedPlaceholder).join(capitalizedObjectName);
+};
+
+String.prototype.changeObjectName = function (objectName) {
+  return this.split(objectNamePlaceholder).join(objectName);
+};
+
+String.prototype.changePackageName = function (packageName) {
+  return this.split(packageNamePlaceholder).join(packageName);
 };
 
 const generate = (fileType, fileName) => {
@@ -33,10 +47,18 @@ const generate = (fileType, fileName) => {
 }
 
 const generateSpringBootCrud = (objectName, options) => {
-  dd(CURR_DIR);
   const objectNameCapitalized = capitalizeFirstLetter(objectName);
-  const componentFile = generateSpringBootFile(springBootComponentFileName, objectNameCapitalizedPlaceholder, objectNameCapitalized).replace('<%objectName%>', objectName.toLowerCase());
-  const repositoryFile = generateSpringBootFile(springBootRepositoryFileName, objectNameCapitalizedPlaceholder, objectNameCapitalized);
+  const componentFile = fs
+    .readFileSync(`./src/templates/${springBootComponentFileName}`, utf8Encoding)
+    .changeCapitalizedObjectName(objectNameCapitalized)
+    .changeObjectName(objectName.toLowerCase())
+    .changePackageName(options.package);
+
+  const repositoryFile = fs
+    .readFileSync(`./src/templates/${springBootRepositoryFileName}`, utf8Encoding)
+    .changeCapitalizedObjectName(objectNameCapitalized)
+    .changePackageName(options.package);
+
 
   if (!fs.existsSync(springBootSaveDirectories.controllers)) {
     console.log(chalk.blue('Criado pasta Controllers'));
@@ -65,21 +87,14 @@ const generateSpringBootCrud = (objectName, options) => {
 
   const modelFile = fs.createWriteStream(`${CURR_DIR}/models/${objectNameCapitalized}.java`);
   modelFile.write(`public class ${objectNameCapitalized} {`);
-  for(propertyName in options.string) {
+  for(propertyName in options.file) {
     modelFile.write(`\n`);
-    const capitalizedPropertyName = capitalizeFirstLetter(options.string[propertyName]);
+    const capitalizedPropertyName = capitalizeFirstLetter(options.file[propertyName]);
     modelFile.write(`  private ${capitalizedPropertyName} ${propertyName}`);
   }
   modelFile.write(`\n`);
   modelFile.write(`}`);
   modelFile.end();
-}
-
-const generateSpringBootFile = (fileName, stringToFind, newValue) => {
-  return fs
-    .readFileSync(`./src/templates/${fileName}`, utf8Encoding)
-    .split(stringToFind)
-    .join(newValue)
 }
 
 const capitalizeFirstLetter = (string) => {
