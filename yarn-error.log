@@ -1,0 +1,38 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Program Files (x86)\Yarn\bin\yarn.js add commander
+
+PATH: 
+  C:\Users\davi.carvalho\Documents\cmder\bin;C:\Users\davi.carvalho\Documents\cmder\vendor\conemu-maximus5\ConEmu\Scripts;C:\Users\davi.carvalho\Documents\cmder\vendor\conemu-maximus5;C:\Users\davi.carvalho\Documents\cmder\vendor\conemu-maximus5\ConEmu;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files\Java\jdk1.8.0_131\bin;C:\ProgramData\Oracle\Java\javapath;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\Git\cmd;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;C:\Program Files (x86)\Yarn\bin\;C:\Users\davi.carvalho\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\Program Files\Microsoft VS Code\bin;C:\Users\davi.carvalho\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Java\jdk1.8.0_131\bin;C:\apache-maven-3.5.0\bin;C:\Program Files\RabbitMQ Server\rabbitmq_server-3.6.10\sbin;C:\Python27;C:\apache-maven-3.5.0\bin;C:\Users\davi.carvalho\Documents\cmder;C:\Program Files\Microsoft VS Code\bin;C:\Users\davi.carvalho\AppData\Local\.meteor\;C:\phantomjs\bin;C:\Program Files\Heroku\bin;C:\;C:\Users\davi.carvalho\AppData\Local\Yarn\bin;C:\Users\davi.carvalho\AppData\Local\hyper\app-2.0.0\resources\bin;C:\Users\davi.carvalho\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\Program Files\Git\usr\bin;C:\Program Files\Git\usr\share\vim\vim74;C:\Users\davi.carvalho\Documents\cmder\
+
+Yarn version: 
+  1.6.0
+
+Node version: 
+  9.11.1
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: getaddrinfo ENOTFOUND nexus.produbanbr.corp nexus.produbanbr.corp:80
+      at GetAddrInfoReqWrap.onlookup [as oncomplete] (dns.js:67:26)
+
+npm manifest: 
+  {
+    "name": "nest-cli",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

@@ -1,0 +1,38 @@
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMappingMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
+
+@RequestMapping(path = "/<%objectName%>")
+@RestController
+public class <%objectNameCapitalized%>Controller {
+  
+  @GetMapping("/")
+  public <%objectNameCapitalized%> getAll<%objectNameCapitalized%>() {
+    
+  }
+
+  @PostMapping("/")
+  public <%objectNameCapitalized%> add<%objectNameCapitalized%>(@RequestBody Usuario usuario) {
+    
+  }
+
+  @GetMapping("/{id}")
+  public <%objectNameCapitalized%> get<%objectNameCapitalized%>(@PathVariable(name = "id") String idParam) {
+    
+  }
+
+  @PutMapping("/{id}")
+  public <%objectNameCapitalized%> update<%objectNameCapitalized%>(@PathVariable(name = "id") String idParam, @RequestBody Usuario usuario) {
+    
+  }
+
+  @DeleteMapping("/{id}")
+  public <%objectNameCapitalized%> delete<%objectNameCapitalized%>(@PathVariable(name = "id") String idParam) {
+    
+  }
+}
