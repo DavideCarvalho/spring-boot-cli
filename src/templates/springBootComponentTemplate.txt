@@ -22,7 +22,7 @@ import <%packageName%>.entities.<%objectNameCapitalized%>;
 public class <%objectNameCapitalized%>Controller {
 
   private final Logger log = LoggerFactory.getLogger(this.getClass());
-  <%objectNameLowered%>Service <%objectNameCapitalized%>Service;
+  private <%objectNameLowered%>Service <%objectNameCapitalized%>Service;
 
   public <%objectNameCapitalized%>Controller(<%objectNameLowered%>Service <%objectNameCapitalized%>Service) { 
     this.<%objectNameLowered%>Service = <%objectNameLowered%>Service;

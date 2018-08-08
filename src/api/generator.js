@@ -4,41 +4,28 @@ const dd = require('dumper.js/src/dd');
 const fs = require('fs');
 const SafeString = require('../schemas/SafeString');
 const FluentWriteStream = require('../schemas/FluentWriteStream');
-const CURR_DIR = process.cwd();
-const SPRING_BOOT_COMPONENT_FILE_NAME = 'springBootComponentTemplate.txt';
-const SPRING_BOOT_REPOSITORY_FILE_NAME = 'springBootRepositoryTemplate.txt';
-const SPRING_BOOT_SERVICE_FILE_NAME = 'springBootServiceTemplate.txt';
-const SPRING_BOOT_SERVICE_IMPL_FILE_NAME = 'springBootServiceImplTemplate.txt';
-const utf8Encoding = 'utf8';
-const springBootSaveDirectories = {
-  controllers: `${CURR_DIR}/controllers`,
-  services: `${CURR_DIR}/services`,
-  servicesImpl: `${CURR_DIR}/services/impl`,
-  entities: `${CURR_DIR}/entities`,
-  repositories: `${CURR_DIR}/repositories`
-};
-
-
-const generate = (fileType, fileName) => {
-  const camelCasedFileName = _.camelCase(fileName);
-  const createdDir = `${CURR_DIR}/src/${fileType}s`;
-  const serviceFile = fs
-    .readFileSync(`./src/templates/${fileType}Template.txt`, utf8Encoding)
-    .replace('<%serviceName%>', camelCasedFileName);
-  if (!fs.existsSync(createdDir))
-    fs.mkdirSync(createdDir);
-  if (fs.existsSync(`${createdDir}/${fileName}.ts`)) {
-    console.log(chalk.red(`${fileType} com o nome \n${fileName} já existente em \n${createdDir}`));
-    return;
-  }
-  fs.writeFileSync(`${createdDir}/${fileName}.ts`, serviceFile);
-  console.log(
-    chalk.blue(`${fileType} ${fileName} \ncriado com sucesso em \n${createdDir}`)
-  );
-}
+const {
+  OBJECT_NAME_CAPITALIZED_PLACEHOLDER,
+  OBJECT_NAME_PLACEHOLDER,
+  PACKAGE_NAME_PLACEHOLDER,
+  OBJECT_NAME_LOWERED_PLACEHOLDER,
+  SPRING_BOOT_COMPONENT_BOILERPLATE_DIR,
+  SPRING_BOOT_REPOSITORY_BOILERPLATE_DIR,
+  SPRING_BOOT_SERVICE_BOILERPLATE_DIR,
+  SPRING_BOOT_SERVICE_IMPL_BOILERPLATE_DIR,
+  SPRING_BOOT_SAVE_DIRECTORIES,
+  SPRING_BOOT_CONTROLLERS_SAVE_DIRECTORY,
+  SPRING_BOOT_SERVICES_SAVE_DIRECTORY,
+  SPRING_BOOT_SERVICES_IMPL_SAVE_DIRECTORY,
+  SPRING_BOOT_REPOSITORIES_SAVE_DIRECTORY,
+  SPRING_BOOT_ENTITIES_SAVE_DIRECTORY,
+  CURR_DIR,
+  UTF8_ENCODING
+} = require('./constants');
 
 const generateSpringBootCrud = (objectName, options) => {
 
+  console.log(SPRING_BOOT_REPOSITORY_BOILERPLATE_DIR);
   if(!options.package) {
     console.log(chalk.red('Por favor, coloque o nome do package para que possa ser atribuído ao template gerado'));
     return;
@@ -46,47 +33,47 @@ const generateSpringBootCrud = (objectName, options) => {
 
   const objectNameCapitalized = capitalizeFirstLetter(objectName);
   const componentFile = SafeString
-    .lift(fs.readFileSync(`./src/templates/${SPRING_BOOT_COMPONENT_FILE_NAME}`, utf8Encoding))
-    .changeCapitalizedObjectName(objectNameCapitalized)
-    .changeObjectName(objectName.toLowerCase())
-    .changePackageName(options.package)
-    .changeLoweredObjectName(lowerFirstLetter(objectName))
+    .lift(fs.readFileSync(SPRING_BOOT_COMPONENT_BOILERPLATE_DIR, UTF8_ENCODING))
+    .changePlaceholder(OBJECT_NAME_CAPITALIZED_PLACEHOLDER, objectNameCapitalized)
+    .changePlaceholder(OBJECT_NAME_PLACEHOLDER, objectName.toLowerCase())
+    .changePlaceholder(PACKAGE_NAME_PLACEHOLDER, options.package)
+    .changePlaceholder(OBJECT_NAME_LOWERED_PLACEHOLDER, lowerFirstLetter(objectName))
     .get();
 
   const repositoryFile = SafeString
-    .lift(fs.readFileSync(`./src/templates/${SPRING_BOOT_REPOSITORY_FILE_NAME}`, utf8Encoding))
-    .changeCapitalizedObjectName(objectNameCapitalized)
-    .changePackageName(options.package)
+    .lift(fs.readFileSync(SPRING_BOOT_REPOSITORY_BOILERPLATE_DIR, UTF8_ENCODING))
+    .changePlaceholder(OBJECT_NAME_CAPITALIZED_PLACEHOLDER, objectNameCapitalized)
+    .changePlaceholder(PACKAGE_NAME_PLACEHOLDER, options.package)
     .get();
 
-  if (!fs.existsSync(springBootSaveDirectories.controllers)) {
+  if (!fs.existsSync(SPRING_BOOT_CONTROLLERS_SAVE_DIRECTORY)) {
     console.log(chalk.blue('Criado pasta Controllers'));
-    fs.mkdirSync(springBootSaveDirectories.controllers);
+    fs.mkdirSync(SPRING_BOOT_CONTROLLERS_SAVE_DIRECTORY);
   }
   
-  if (!fs.existsSync(`${springBootSaveDirectories.controllers}/${objectNameCapitalized}Controller.java`)) {
+  if (!fs.existsSync(`${SPRING_BOOT_CONTROLLERS_SAVE_DIRECTORY}/${objectNameCapitalized}Controller.java`)) {
     console.log(chalk.blue(`${objectNameCapitalized}Controller criado com sucesso`));
-    fs.writeFileSync(`${springBootSaveDirectories.controllers}/${objectNameCapitalized}Controller.java`, componentFile);
+    fs.writeFileSync(`${SPRING_BOOT_CONTROLLERS_SAVE_DIRECTORY}/${objectNameCapitalized}Controller.java`, componentFile);
   }
 
-  if (!fs.existsSync(springBootSaveDirectories.repositories)) {
+  if (!fs.existsSync(SPRING_BOOT_REPOSITORIES_SAVE_DIRECTORY)) {
     console.log(chalk.blue('Criado pasta Repositories'));
-    fs.mkdirSync(springBootSaveDirectories.repositories);
+    fs.mkdirSync(SPRING_BOOT_REPOSITORIES_SAVE_DIRECTORY);
   }
   
-  if (!fs.existsSync(`${springBootSaveDirectories.repositories}/${objectNameCapitalized}Repository.java`)) {
+  if (!fs.existsSync(`${SPRING_BOOT_REPOSITORIES_SAVE_DIRECTORY}/${objectNameCapitalized}Repository.java`)) {
     console.log(chalk.blue(`${objectNameCapitalized}Repository criado com sucesso`));
-    fs.writeFileSync(`${springBootSaveDirectories.repositories}/${objectNameCapitalized}Repository.java`, repositoryFile);
+    fs.writeFileSync(`${SPRING_BOOT_REPOSITORIES_SAVE_DIRECTORY}/${objectNameCapitalized}Repository.java`, repositoryFile);
   }
 
-  if (!fs.existsSync(springBootSaveDirectories.entities)) {
+  if (!fs.existsSync(SPRING_BOOT_ENTITIES_SAVE_DIRECTORY)) {
     console.log(chalk.blue('Criado pasta Entities'));
-    fs.mkdirSync(springBootSaveDirectories.entities);
+    fs.mkdirSync(SPRING_BOOT_ENTITIES_SAVE_DIRECTORY);
   }
 
-  if(!fs.existsSync(`${springBootSaveDirectories.entities}/${objectNameCapitalized}.java`)) {
+  if(!fs.existsSync(`${SPRING_BOOT_ENTITIES_SAVE_DIRECTORY}/${objectNameCapitalized}.java`)) {
     let modelFile = FluentWriteStream
-      .lift(`${springBootSaveDirectories.entities}/${objectNameCapitalized}.java`)
+      .lift(`${SPRING_BOOT_ENTITIES_SAVE_DIRECTORY}/${objectNameCapitalized}.java`)
       .writeAndJumpLine(`package ${options.package};`)
       .newLine()
       .writeAndJumpLine('import javax.persistence.Entity;')
@@ -123,41 +110,40 @@ const generateSpringBootCrud = (objectName, options) => {
   }
 
   const serviceFile = SafeString
-    .lift(fs.readFileSync(`./src/templates/${SPRING_BOOT_SERVICE_FILE_NAME}`, utf8Encoding))
-    .changeCapitalizedObjectName(objectNameCapitalized)
-    .changeLoweredObjectName(lowerFirstLetter(objectName))
-    .changePackageName(options.package)
+    .lift(fs.readFileSync(SPRING_BOOT_SERVICE_BOILERPLATE_DIR, UTF8_ENCODING))
+    .changePlaceholder(OBJECT_NAME_CAPITALIZED_PLACEHOLDER, objectNameCapitalized)
+    .changePlaceholder(OBJECT_NAME_LOWERED_PLACEHOLDER, lowerFirstLetter(objectName))
+    .changePlaceholder(PACKAGE_NAME_PLACEHOLDER, options.package)
     .get();
 
-  if (!fs.existsSync(springBootSaveDirectories.services)) {
+  if (!fs.existsSync(SPRING_BOOT_SERVICES_SAVE_DIRECTORY)) {
     console.log(chalk.blue('Criado pasta Services'));
-    fs.mkdirSync(springBootSaveDirectories.services);
+    fs.mkdirSync(SPRING_BOOT_SERVICES_SAVE_DIRECTORY);
   }
 
-  if (!fs.existsSync(`${springBootSaveDirectories.services}/${objectNameCapitalized}Service.java`)) {
+  if (!fs.existsSync(`${SPRING_BOOT_SERVICES_SAVE_DIRECTORY}/${objectNameCapitalized}Service.java`)) {
     console.log(chalk.blue(`${objectNameCapitalized}Service criado com sucesso`));
-    fs.writeFileSync(`${springBootSaveDirectories.services}/${objectNameCapitalized}Service.java`, serviceFile);
+    fs.writeFileSync(`${SPRING_BOOT_SERVICES_SAVE_DIRECTORY}/${objectNameCapitalized}Service.java`, serviceFile);
   }
 
   const serviceImplFile = SafeString
-    .lift(fs.readFileSync(`./src/templates/${SPRING_BOOT_SERVICE_IMPL_FILE_NAME}`, utf8Encoding))
-    .changeCapitalizedObjectName(objectNameCapitalized)
-    .changeLoweredObjectName(lowerFirstLetter(objectName))
-    .changePackageName(options.package)
+    .lift(fs.readFileSync(SPRING_BOOT_SERVICE_IMPL_BOILERPLATE_DIR, UTF8_ENCODING))
+    .changePlaceholder(OBJECT_NAME_CAPITALIZED_PLACEHOLDER, objectNameCapitalized)
+    .changePlaceholder(OBJECT_NAME_LOWERED_PLACEHOLDER, lowerFirstLetter(objectName))
+    .changePlaceholder(PACKAGE_NAME_PLACEHOLDER, options.package)
     .get();
 
-  if (!fs.existsSync(springBootSaveDirectories.servicesImpl)) {
+  if (!fs.existsSync(SPRING_BOOT_SERVICES_IMPL_SAVE_DIRECTORY)) {
     console.log(chalk.blue('Criado pasta Services/Impl'));
-    fs.mkdirSync(springBootSaveDirectories.servicesImpl);
+    fs.mkdirSync(SPRING_BOOT_SERVICES_IMPL_SAVE_DIRECTORY);
   }
 
-  if (!fs.existsSync(`${springBootSaveDirectories.servicesImpl}/${objectNameCapitalized}ServiceImpl.java`)) {
+  if (!fs.existsSync(`${SPRING_BOOT_SERVICES_IMPL_SAVE_DIRECTORY}/${objectNameCapitalized}ServiceImpl.java`)) {
     console.log(chalk.blue(`${objectNameCapitalized}ServiceImpl criado com sucesso`));
-    fs.writeFileSync(`${springBootSaveDirectories.servicesImpl}/${objectNameCapitalized}ServiceImpl.java`, serviceImplFile);
+    fs.writeFileSync(`${SPRING_BOOT_SERVICES_IMPL_SAVE_DIRECTORY}/${objectNameCapitalized}ServiceImpl.java`, serviceImplFile);
   }
 
 }
-
 
 const capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -168,6 +154,5 @@ const lowerFirstLetter = (string) => {
 }
 
 module.exports = {
-  generate,
   generateSpringBootCrud
 }

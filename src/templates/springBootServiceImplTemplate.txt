@@ -1,4 +1,4 @@
-package <%packageName%>.service.impl;
+package <%packageName%>.services.impl;
 
 import org.springframework.stereotype.Service;
 import <%packageName%>.repositories.<%objectNameCapitalized%>Repository;
