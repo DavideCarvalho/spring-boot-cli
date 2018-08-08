@@ -3,3 +3,4 @@
   "idCliente": "integer",
   "dataNascimento": "date"
 }
+nest-cli crud Usuario -f Usuario.json -p br.com.package
