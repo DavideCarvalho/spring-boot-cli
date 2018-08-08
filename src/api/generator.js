@@ -110,8 +110,10 @@ const generateSpringBootCrud = (objectName, options) => {
           .writeAndJumpLine('  @GeneratedValue');
       }
       modelFile = modelFile
-        .writeAndJumpLine('  @Column')
-        .writeAndJumpLine(`  private ${capitalizedPropertyName} ${propertyName};`)
+        .writeAndJumpLine('  @Column');
+      modelFile = propertyName.toUpperCase().includes('ID') ? 
+        modelFile.writeAndJumpLine(`  private Long ${propertyName};`) :
+        modelFile.writeAndJumpLine(`  private ${capitalizedPropertyName} ${propertyName};`);
     }
     modelFile = modelFile
       .newLine()
