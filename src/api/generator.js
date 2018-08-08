@@ -2,31 +2,22 @@ const _ = require('lodash');
 const chalk = require('chalk');
 const dd = require('dumper.js/src/dd');
 const fs = require('fs');
+const SafeString = require('../schemas/SafeString');
+const FluentWriteStream = require('../schemas/FluentWriteStream');
 const CURR_DIR = process.cwd();
-const springBootComponentFileName = 'springBootComponentTemplate.txt';
-const springBootRepositoryFileName = 'springBootRepositoryTemplate.txt';
-const objectNameCapitalizedPlaceholder = '<%objectNameCapitalized%>';
-const objectNamePlaceholder = '<%objectName%>';
-const packageNamePlaceholder = '<%packageName%>';
+const SPRING_BOOT_COMPONENT_FILE_NAME = 'springBootComponentTemplate.txt';
+const SPRING_BOOT_REPOSITORY_FILE_NAME = 'springBootRepositoryTemplate.txt';
+const SPRING_BOOT_SERVICE_FILE_NAME = 'springBootServiceTemplate.txt';
+const SPRING_BOOT_SERVICE_IMPL_FILE_NAME = 'springBootServiceImplTemplate.txt';
 const utf8Encoding = 'utf8';
 const springBootSaveDirectories = {
   controllers: `${CURR_DIR}/controllers`,
   services: `${CURR_DIR}/services`,
-  models: `${CURR_DIR}/models`,
+  servicesImpl: `${CURR_DIR}/services/impl`,
+  entities: `${CURR_DIR}/entities`,
   repositories: `${CURR_DIR}/repositories`
 };
 
-String.prototype.changeCapitalizedObjectName = function(capitalizedObjectName) {
-  return this.split(objectNameCapitalizedPlaceholder).join(capitalizedObjectName);
-};
-
-String.prototype.changeObjectName = function (objectName) {
-  return this.split(objectNamePlaceholder).join(objectName);
-};
-
-String.prototype.changePackageName = function (packageName) {
-  return this.split(packageNamePlaceholder).join(packageName);
-};
 
 const generate = (fileType, fileName) => {
   const camelCasedFileName = _.camelCase(fileName);
@@ -47,18 +38,26 @@ const generate = (fileType, fileName) => {
 }
 
 const generateSpringBootCrud = (objectName, options) => {
+
+  if(!options.package) {
+    console.log(chalk.red('Por favor, coloque o nome do package para que possa ser atribuído ao template gerado'));
+    return;
+  }
+
   const objectNameCapitalized = capitalizeFirstLetter(objectName);
-  const componentFile = fs
-    .readFileSync(`./src/templates/${springBootComponentFileName}`, utf8Encoding)
+  const componentFile = SafeString
+    .lift(fs.readFileSync(`./src/templates/${SPRING_BOOT_COMPONENT_FILE_NAME}`, utf8Encoding))
     .changeCapitalizedObjectName(objectNameCapitalized)
     .changeObjectName(objectName.toLowerCase())
-    .changePackageName(options.package);
+    .changePackageName(options.package)
+    .changeLoweredObjectName(lowerFirstLetter(objectName))
+    .get();
 
-  const repositoryFile = fs
-    .readFileSync(`./src/templates/${springBootRepositoryFileName}`, utf8Encoding)
+  const repositoryFile = SafeString
+    .lift(fs.readFileSync(`./src/templates/${SPRING_BOOT_REPOSITORY_FILE_NAME}`, utf8Encoding))
     .changeCapitalizedObjectName(objectNameCapitalized)
-    .changePackageName(options.package);
-
+    .changePackageName(options.package)
+    .get();
 
   if (!fs.existsSync(springBootSaveDirectories.controllers)) {
     console.log(chalk.blue('Criado pasta Controllers'));
@@ -70,7 +69,7 @@ const generateSpringBootCrud = (objectName, options) => {
     fs.writeFileSync(`${springBootSaveDirectories.controllers}/${objectNameCapitalized}Controller.java`, componentFile);
   }
 
-  if (!fs.existsSync(springBootSaveDirectories.repositories)){
+  if (!fs.existsSync(springBootSaveDirectories.repositories)) {
     console.log(chalk.blue('Criado pasta Repositories'));
     fs.mkdirSync(springBootSaveDirectories.repositories);
   }
@@ -80,25 +79,90 @@ const generateSpringBootCrud = (objectName, options) => {
     fs.writeFileSync(`${springBootSaveDirectories.repositories}/${objectNameCapitalized}Repository.java`, repositoryFile);
   }
 
-  if (!fs.existsSync(springBootSaveDirectories.models)){
-    console.log(chalk.blue('Criado pasta Models'));
-    fs.mkdirSync(springBootSaveDirectories.models);
+  if (!fs.existsSync(springBootSaveDirectories.entities)) {
+    console.log(chalk.blue('Criado pasta Entities'));
+    fs.mkdirSync(springBootSaveDirectories.entities);
   }
 
-  const modelFile = fs.createWriteStream(`${CURR_DIR}/models/${objectNameCapitalized}.java`);
-  modelFile.write(`public class ${objectNameCapitalized} {`);
-  for(propertyName in options.file) {
-    modelFile.write(`\n`);
-    const capitalizedPropertyName = capitalizeFirstLetter(options.file[propertyName]);
-    modelFile.write(`  private ${capitalizedPropertyName} ${propertyName}`);
+  if(!fs.existsSync(`${springBootSaveDirectories.entities}/${objectNameCapitalized}.java`)) {
+    let modelFile = FluentWriteStream
+      .lift(`${springBootSaveDirectories.entities}/${objectNameCapitalized}.java`)
+      .writeAndJumpLine(`package ${options.package};`)
+      .newLine()
+      .writeAndJumpLine('import javax.persistence.Entity;')
+      .writeAndJumpLine('import javax.persistence.Table;')
+      .writeAndJumpLine('import javax.persistence.Column;')
+      .writeAndJumpLine('import javax.persistence.TemporalType;')
+      .writeAndJumpLine('import javax.persistence.Temporal;')
+      .writeAndJumpLine('import javax.persistence.Id;')
+      .writeAndJumpLine('import javax.persistence.GeneratedValue;')
+      .newLine()
+      .writeAndJumpLine('@Entity')
+      .writeAndJumpLine(`@Table(name="${objectNameCapitalized.toLowerCase()}")`)
+      .writeAndJumpLine(`public class ${objectNameCapitalized} {`)
+    for(const propertyName in options.file) {
+      modelFile = modelFile.newLine();
+      const capitalizedPropertyName = capitalizeFirstLetter(options.file[propertyName]);
+      if (capitalizedPropertyName.toUpperCase() === 'DATE') modelFile = modelFile.write('  @Temporal(Temporal.Type.TIMESTAMP)\n');
+      if (propertyName.toUpperCase().includes('ID')) {
+        modelFile = modelFile
+          .writeAndJumpLine('  @Id')
+          .writeAndJumpLine('  @GeneratedValue');
+      }
+      modelFile = modelFile
+        .writeAndJumpLine('  @Column')
+        .writeAndJumpLine(`  private ${capitalizedPropertyName} ${propertyName};`)
+    }
+    modelFile = modelFile
+      .newLine()
+      .writeAndJumpLine(`}`)
+      .end();
+      console.log(chalk.blue(`Entidade ${objectNameCapitalized} criado com sucesso`));
   }
-  modelFile.write(`\n`);
-  modelFile.write(`}`);
-  modelFile.end();
+
+  const serviceFile = SafeString
+    .lift(fs.readFileSync(`./src/templates/${SPRING_BOOT_SERVICE_FILE_NAME}`, utf8Encoding))
+    .changeCapitalizedObjectName(objectNameCapitalized)
+    .changeLoweredObjectName(lowerFirstLetter(objectName))
+    .changePackageName(options.package)
+    .get();
+
+  if (!fs.existsSync(springBootSaveDirectories.services)) {
+    console.log(chalk.blue('Criado pasta Services'));
+    fs.mkdirSync(springBootSaveDirectories.services);
+  }
+
+  if (!fs.existsSync(`${springBootSaveDirectories.services}/${objectNameCapitalized}Service.java`)) {
+    console.log(chalk.blue(`${objectNameCapitalized}Service criado com sucesso`));
+    fs.writeFileSync(`${springBootSaveDirectories.services}/${objectNameCapitalized}Service.java`, serviceFile);
+  }
+
+  const serviceImplFile = SafeString
+    .lift(fs.readFileSync(`./src/templates/${SPRING_BOOT_SERVICE_IMPL_FILE_NAME}`, utf8Encoding))
+    .changeCapitalizedObjectName(objectNameCapitalized)
+    .changeLoweredObjectName(lowerFirstLetter(objectName))
+    .changePackageName(options.package)
+    .get();
+
+  if (!fs.existsSync(springBootSaveDirectories.servicesImpl)) {
+    console.log(chalk.blue('Criado pasta Services/Impl'));
+    fs.mkdirSync(springBootSaveDirectories.servicesImpl);
+  }
+
+  if (!fs.existsSync(`${springBootSaveDirectories.servicesImpl}/${objectNameCapitalized}ServiceImpl.java`)) {
+    console.log(chalk.blue(`${objectNameCapitalized}ServiceImpl criado com sucesso`));
+    fs.writeFileSync(`${springBootSaveDirectories.servicesImpl}/${objectNameCapitalized}ServiceImpl.java`, serviceImplFile);
+  }
+
 }
+
 
 const capitalizeFirstLetter = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+const lowerFirstLetter = (string) => {
+  return string.charAt(0).toLowerCase() + string.slice(1);
 }
 
 module.exports = {

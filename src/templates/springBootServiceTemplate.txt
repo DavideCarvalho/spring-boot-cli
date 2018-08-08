@@ -1,0 +1,12 @@
+package <%packageName%>.service;
+
+import java.util.List;
+
+import <%packageName%>.entities.<%objectNameCapitalized%>;
+
+public interface <%objectNameCapitalized%>Service {
+  List<%objectNameCapitalized%> findAll();
+  <%objectNameCapitalized%> find(Long id);
+  <%objectNameCapitalized%> save(<%objectNameCapitalized%> <%objectNameLowered%>);
+  void delete(Long id);
+}

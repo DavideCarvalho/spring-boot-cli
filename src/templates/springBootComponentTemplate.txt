@@ -1,5 +1,10 @@
 package <%packageName%>.controllers;
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMappingMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,32 +14,72 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@RequestMapping(path = "/<%objectName%>")
+import <%packageName%>.services.<%objectNameCapitalized%>Service;
+import <%packageName%>.entities.<%objectNameCapitalized%>;
+
 @RestController
+@RequestMapping(value = "/<%objectName%>")
 public class <%objectNameCapitalized%>Controller {
+
+  private final Logger log = LoggerFactory.getLogger(this.getClass());
+  <%objectNameLowered%>Service <%objectNameCapitalized%>Service;
+
+  public <%objectNameCapitalized%>Controller(<%objectNameLowered%>Service <%objectNameCapitalized%>Service) { 
+    this.<%objectNameLowered%>Service = <%objectNameLowered%>Service;
+  }
   
-  @GetMapping("/")
-  public <%objectNameCapitalized%> getAll<%objectNameCapitalized%>() {
-    
+  @GetMapping()
+  public ResponseEntity<List<<%objectNameCapitalized%>>> getAll<%objectNameCapitalized%>() {
+    try {
+      List<<%objectNameLowered%>> lista<%objectNameCapitalized%> = this.<%objectNameLowered%>Service.findAll();
+      return new ResponseEntity<>(lista<%objectNameCapitalized%>, HttpStatus.OK);
+    } catch (Exception e) {
+      log.error(e.getMessage(),e);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  @PostMapping("/")
-  public <%objectNameCapitalized%> add<%objectNameCapitalized%>(@RequestBody Usuario usuario) {
-    
+  @PostMapping()
+  public ResponseEntity<<%objectNameCapitalized%>> add<%objectNameCapitalized%>(@RequestBody <%objectNameCapitalized%> <%objectNameLowered%>) {
+    try {
+      <%objectNameCapitalized%> <%objectNameLowered%> = this.<%objectNameLowered%>Service.save(<%objectNameLowered%>);
+      return new ResponseEntity<>(<%objectNameLowered%>, HttpStatus.OK);
+    } catch (Exception e) {
+      log.error(e.getMessage(),e);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  @GetMapping("/{id}")
-  public <%objectNameCapitalized%> get<%objectNameCapitalized%>(@PathVariable(name = "id") String idParam) {
-    
+  @GetMapping(value = "/{id}")
+  public ResponseEntity<<%objectNameCapitalized%>> get<%objectNameCapitalized%>(@PathVariable(name = "id") Long idParam) {
+    try {
+      <%objectNameCapitalized%> <%objectNameLowered%> = this.<%objectNameLowered%>Service.find(idParam);
+      return new ResponseEntity<>(<%objectNameLowered%>, HttpStatus.OK);
+    } catch (Exception e) {
+      log.error(e.getMessage(),e);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  @PutMapping("/{id}")
-  public <%objectNameCapitalized%> update<%objectNameCapitalized%>(@PathVariable(name = "id") String idParam, @RequestBody Usuario usuario) {
-    
+  @PutMapping(value = "/{id}")
+  public ResponseEntity<<%objectNameCapitalized%>> update<%objectNameCapitalized%>(@PathVariable(name = "id") String idParam, @RequestBody Usuario usuario) {
+    try {
+      <%objectNameCapitalized%> <%objectNameLowered%> = this.<%objectNameLowered%>Service.save(<%objectNameLowered%>);
+      return new ResponseEntity<>(<%objectNameLowered%>, HttpStatus.OK);
+    } catch (Exception e) {
+      log.error(e.getMessage(),e);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  @DeleteMapping("/{id}")
-  public <%objectNameCapitalized%> delete<%objectNameCapitalized%>(@PathVariable(name = "id") String idParam) {
-    
+  @DeleteMapping(value = "/{id}")
+  public ResponseEntity delete<%objectNameCapitalized%>(@PathVariable(name = "id") Long idParam) {
+    try {
+      this.<%objectNameLowered%>Service.delete(idParam);
+      return new ResponseEntity<>(HttpStatus.OK);
+    } catch (Exception e) {
+      log.error(e.getMessage(),e);
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

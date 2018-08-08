@@ -1,0 +1,32 @@
+package <%packageName%>.service.impl;
+
+import org.springframework.stereotype.Service;
+import <%packageName%>.repositories.<%objectNameCapitalized%>Repository;
+import <%packageName%>.entities.<%objectNameCapitalized%>;
+
+@Service
+public class <%objectNameCapitalized%>ServiceImpl extends <%objectNameCapitalized%>Service {
+
+  <%objectNameCapitalized%>Repository <%objectNameLowered%>Repository;
+
+  public <%objectNameCapitalized%>ServiceImpl(<%objectNameCapitalized%>Repository <%objectNameLowered%>) {
+    this.<%objectNameLowered%>Repository = <%objectNameLowered%>Repository;
+  }
+
+  public List<%objectNameCapitalized%> findAll() {
+    return this.<%objectNameLowered%>Repository.findAll();
+  }
+
+  public <%objectNameCapitalized%> find(Long id) {
+    return this.<%objectNameLowered%>Repository.find(id);
+  }
+
+  public <%objectNameCapitalized%> save(<%objectNameCapitalized%> <%objectNameLowered%>) {
+    return this.<%objectNameLowered%>Repository.save(<%objectNameLowered%>);
+  }
+
+  void delete(Long id) {
+    this.<%objectNameLowered%>Repository.delete(id);
+  }
+
+}

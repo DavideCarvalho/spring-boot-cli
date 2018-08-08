@@ -1,5 +1,5 @@
 package <%packageName%>.repositories;
 
-public interface <%objectNameCapitalized%>Repository extends JpaRepository<<%objectNameCapitalized%>, Long> {
+public interface <%objectNameCapitalized%>Repository extends CrudRepository<<%objectNameCapitalized%>, Long> {
 
 }

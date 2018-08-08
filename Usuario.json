@@ -1,3 +1,5 @@
 {
-  "name": "string"
+  "name": "string",
+  "idCliente": "integer",
+  "dataNascimento": "date"
 }
